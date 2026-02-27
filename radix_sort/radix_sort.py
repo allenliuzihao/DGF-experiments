@@ -1,4 +1,6 @@
 import utils
+import os
+from multiprocessing import Pool
 
 def radix_sort_serial(objects: list[utils.Object]):
     # Find the maximum number to know the number of digits
@@ -40,6 +42,44 @@ def radix_sort_serial_prefix_scan(objects: list[utils.Object]):
         for obj in objects:
             digit_value = (obj.key >> (i * 8)) & 0xFF
             buckets[digit_value] += 1
+        
+        # Compute prefix sums to determine the starting index for each bucket
+        offset = 0
+        for j in range(0, 256):
+            temp = buckets[j]
+            buckets[j] = offset
+            offset += temp
+        
+        # Create a temporary array to hold the sorted objects for this iteration
+        for obj in objects:
+            digit_value = (obj.key >> (i * 8)) & 0xFF
+            temporary[buckets[digit_value]] = obj               
+            buckets[digit_value] += 1
+
+        # Copy the sorted objects back to the original list
+        for j in range(len(objects)):
+            objects[j] = temporary[j]
+
+def radix_sort_parallel(objects: list[utils.Object]):
+    # scan 8 bits at a time, so we need 256 buckets
+    buckets = [0 for _ in range(256)]
+    max_key = max(obj.key for obj in objects)
+    num_iterations = (max_key.bit_length() + 7) // 8
+
+    temporary = [None] * len(objects)  # Temporary array to hold sorted objects for this iteration
+
+    num_workers = os.cpu_count() or 1
+    chunk_size = len(objects) // num_workers
+
+    for i in range(num_iterations):
+
+        # prepare chunks for parallel processing
+        chunks = [objects[j:j+chunk_size] for j in range(0, len(objects), chunk_size)]
+        with Pool(num_workers) as pool:
+            local_histograms = pool.starmap(utils.count_digits_chunk, [(chunk, i) for chunk in chunks])
+        
+        # Merge histograms
+        buckets = utils.merge_all(local_histograms)
         
         # Compute prefix sums to determine the starting index for each bucket
         offset = 0
