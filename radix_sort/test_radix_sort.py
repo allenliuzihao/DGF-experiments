@@ -204,6 +204,7 @@ class TestRadixSort(unittest.TestCase):
         keys = [obj.key for obj in objects]
         self.assertEqual(keys, sorted(keys))
 
+        objects = [utils.Object(random.randint(0, num_elements), f"val_{i}") for i in range(num_elements)]
         start_time = time.time()
         radix_sort.radix_sort_serial(objects)
         end_time = time.time()
