@@ -15,3 +15,6 @@ def get_num_digits(num: int) -> int:
 
 def get_digit(num: int, digit: int) -> int:
     return (num // (10 ** digit)) % 10
+
+def countl_zero(x, bits=32):
+    return bits - x.bit_length()

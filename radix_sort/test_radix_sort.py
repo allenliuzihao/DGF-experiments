@@ -178,19 +178,38 @@ class TestRadixSort(unittest.TestCase):
         """Test sorting a large list of random elements"""
         random.seed(0)  # for reproducibility
 
+        num_elements = 10000
+        objects = [utils.Object(random.randint(0, num_elements), f"val_{i}") for i in range(num_elements)]
+        radix_sort.radix_sort_serial_prefix_scan(objects)
+        keys = [obj.key for obj in objects]
+        self.assertEqual(keys, sorted(keys))
+
+        objects = [utils.Object(random.randint(0, num_elements), f"val_{i}") for i in range(num_elements)]
+        radix_sort.radix_sort_serial(objects)
+        keys = [obj.key for obj in objects]
+        self.assertEqual(keys, sorted(keys))
+
+    def test_timing_large_list(self):
+        """Test timing of sorting a large list of random elements"""
+        random.seed(0)  # for reproducibility
+
         num_elements = 1000000
         objects = [utils.Object(random.randint(0, num_elements), f"val_{i}") for i in range(num_elements)]
         
         start_time = time.time()
+        radix_sort.radix_sort_serial_prefix_scan(objects)
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        print(f"\nRadix sort (prefix scan) execution time for {num_elements} elements: {elapsed_time:.4f} seconds")
+
+        start_time = time.time()
         radix_sort.radix_sort_serial(objects)
         end_time = time.time()
         elapsed_time = end_time - start_time
-        
-        print(f"\nRadix sort execution time for {num_elements} elements: {elapsed_time:.4f} seconds")
-        
-        keys = [obj.key for obj in objects]
-        self.assertEqual(keys, sorted(keys))
-
+        print(f"\nRadix sort (serial) execution time for {num_elements} elements: {elapsed_time:.4f} seconds")
 
 if __name__ == '__main__':
     unittest.main()
+    #objects = [utils.Object(random.randint(0, 100000), f"val_{i}") for i in range(100000)]
+    #radix_sort.radix_sort_serial_prefix_scan(objects)
+
