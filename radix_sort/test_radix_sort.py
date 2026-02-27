@@ -201,15 +201,16 @@ class TestRadixSort(unittest.TestCase):
         end_time = time.time()
         elapsed_time = end_time - start_time
         print(f"\nRadix sort (prefix scan) execution time for {num_elements} elements: {elapsed_time:.4f} seconds")
+        keys = [obj.key for obj in objects]
+        self.assertEqual(keys, sorted(keys))
 
         start_time = time.time()
         radix_sort.radix_sort_serial(objects)
         end_time = time.time()
         elapsed_time = end_time - start_time
         print(f"\nRadix sort (serial) execution time for {num_elements} elements: {elapsed_time:.4f} seconds")
+        keys = [obj.key for obj in objects]
+        self.assertEqual(keys, sorted(keys))
 
 if __name__ == '__main__':
     unittest.main()
-    #objects = [utils.Object(random.randint(0, 100000), f"val_{i}") for i in range(100000)]
-    #radix_sort.radix_sort_serial_prefix_scan(objects)
-
